@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import {BrowserRouter, Switch, Route, Link} from 'react-router-dom';
 import Home from './Home';
 import Dashboard from './Dashboard';
+import Login from './auth/Login';
+import Register from './auth/Registration';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import Navigation from './Navigation';
 
 export default class App extends Component {
   constructor() {
@@ -46,6 +51,22 @@ export default class App extends Component {
     });
   }
 
+  handleSuccess(data) {
+    // Todo: Handle success
+    this.props.handleLogin(data);
+    this.props.history.push('/');
+}
+
+handleLogoutButton() {
+    axios.delete("http://localhost:3001/logout", {withCredentials: true})
+    .then(response => {
+        this.props.handleLogout();
+    })
+    .catch(error => {
+        console.log("Logout error ", error);
+    });
+}
+
   handleLogout() {
     this.setState({
       isLoggedIn: "No",
@@ -56,6 +77,7 @@ export default class App extends Component {
   render() {
     return (
       <div className='app'>
+         <Navigation isLoggedIn={this.state.isLoggedIn} handleLogout={this.handleLogout}/>
         <BrowserRouter>
           <Switch>
             <Route exact path={'/'} render={
@@ -65,7 +87,17 @@ export default class App extends Component {
             }/>
             <Route exact path={'/dashboard'}render={
               (props) => (
-                <Dashboard {...props} isLoggedIn={this.state.isLoggedIn} />
+                <Dashboard {...props} handleLogout={this.handleLogout} isLoggedIn={this.state.isLoggedIn} />
+              )
+            }/>
+            <Route exact path={'/login'}render={
+              (props) => (
+                <Login {...props} isLoggedIn={this.state.isLoggedIn} handleLogin={this.handleLogin}/>
+              )
+            }/>
+            <Route exact path={'/register'}render={
+              (props) => (
+                <Register {...props} isLoggedIn={this.state.isLoggedIn} handleLogin={this.handleLogin}/>
               )
             }/>
           </Switch>

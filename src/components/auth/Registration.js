@@ -12,12 +12,19 @@ export default class Registration extends Component {
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleSuccess = this.handleSuccess.bind(this);
     }
 
     handleChange(e) {
         this.setState({
             [e.target.name]: e.target.value
         });
+    }
+
+    handleSuccess(data) {
+        // Todo: Handle success
+        this.props.handleLogin(data);
+        this.props.history.push('/');
     }
 
     handleSubmit(e) {
@@ -34,7 +41,7 @@ export default class Registration extends Component {
             {headers: { 'Access-Control-Allow-Origin': 'http://localhost:3000' },}
         ).then(response => {
             if (response.data.status === "created") {
-                this.props.handleSuccess(response.data);
+                this.handleSuccess(response.data);
             }
             console.log(response);
         }).catch(error => {
@@ -44,8 +51,9 @@ export default class Registration extends Component {
     }
     render() {
         return (
-            <div>
+            <div className="container banner">
                 <form onSubmit={this.handleSubmit}>
+                  <div className="form-group my-2">
                     <label>Email</label>
                     <input 
                     type="email"
@@ -56,6 +64,8 @@ export default class Registration extends Component {
                     onChange={this.handleChange}
                     />
                     {this.state.error && <div className="alert alert-danger">{this.state.error}</div>}
+                    </div>
+                    <div className="form-group my-2">
                     <label>Password</label>
                     <input 
                     type="password"
@@ -65,6 +75,8 @@ export default class Registration extends Component {
                     value={this.state.password} 
                     onChange={this.handleChange}
                     />
+                    </div>
+                    <div className="form-group my-2">
                     <label>Password Confirm</label>
                     <input 
                     type="password"
@@ -74,6 +86,7 @@ export default class Registration extends Component {
                     value={this.state.passwordConfirm} 
                     onChange={this.handleChange}
                     />
+                    </div>
                     <button type="submit" className="btn btn-primary">Register</button>
                 </form>
             </div>

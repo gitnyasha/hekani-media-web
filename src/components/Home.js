@@ -1,41 +1,48 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-import Login from './auth/Login';
-import Registration from './auth/Registration';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
-export default class Home extends Component {
-    constructor (props) {
-        super(props);
-        this.handleSuccess = this.handleSuccess.bind(this);
-        this.handleLogoutButton = this.handleLogoutButton.bind(this);
-    }
+const Home = (props) => {
+    const [articles, setArticles] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    handleSuccess(data) {
-        // Todo: Handle success
-        this.props.handleLogin(data);
-        this.props.history.push('/dashboard');
-    }
+    useEffect(() => {
+        const fetchArticles = async () => {
 
-    handleLogoutButton() {
-        axios.delete("http://localhost:3001/logout", {withCredentials: true})
-        .then(response => {
-            this.props.handleLogout();
-        })
-        .catch(error => {
-            console.log("Logout error ", error);
-        });
+        try {
+                const res = await axios.get('http://localhost:3001/articles', {withCredentials: true})
+                .then((response) => {
+                    const myArticles = response.data;
+                    setArticles(myArticles);
+                    setIsLoading(false);
+                })
+        } catch (error) {
+            console.error(error);
+        }
     }
+    fetchArticles();
+    }, [])
 
-    render() {
-        return (
-            <div>
-                <Link to="/dashboard"><h1>Dashboard</h1></Link>
-                <h1>Home status: {this.props.isLoggedIn}</h1>
-                {this.props.isLoggedIn 
-                ? <button onClick={() => this.handleLogoutButton()}>Logout</button> 
-                : <div><Registration handleSuccess={this.handleSuccess}/><Login handleSuccess={this.handleSuccess}/></div>}
-            </div>
-        );
-    }
+    return (
+        <div className="container">
+            {isLoading ? (
+                <h1 className="text-center m-50">Loading...</h1>
+                
+            ) : (<div>
+                    <div className="row">
+                        <h1>Hello World</h1>
+                    </div>
+                    <div className="row">
+                        {articles.map((article) => (
+                            <div className="col-sm-10 banner m-1">
+                                <article key={article.id}>
+                                    <a href={article.link} target="_blank">{article.title}</a>
+                                </article>
+                            </div>
+                        ))}
+                    </div>
+                </div>)}
+        </div>
+    );
 }
+
+export default Home;
